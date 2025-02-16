@@ -8,11 +8,8 @@ ARG GIT_URL=https://github.com/RIPE-NCC/ripe-atlas-software-probe.git
 
 WORKDIR /root
 
-RUN if [ "$BUILDPLATFORM" != "$TARGETPLATFORM" ]; then \
-        apt-get update -y && \
-        apt-get install -y git build-essential debhelper libssl-dev autotools-dev psmisc net-tools; \
-    fi
-
+RUN apt-get update -y && \
+        apt-get install -y git build-essential debhelper libssl-dev autotools-dev psmisc net-tools
 RUN git clone --recursive "$GIT_URL"
 
 WORKDIR /root/ripe-atlas-software-probe
