@@ -1,8 +1,6 @@
 ## builder
-FROM --platform=$BUILDPLATFORM debian:12-slim as builder
+FROM debian:12 as builder
 LABEL image="ripe-atlas-builder"
-ARG BUILDPLATFORM
-ARG TARGETPLATFORM
 ARG DEBIAN_FRONTEND=noninteractive
 ARG GIT_URL=https://github.com/RIPE-NCC/ripe-atlas-software-probe.git
 
@@ -26,7 +24,7 @@ LABEL image="ripe-atlas-artifacts"
 COPY --from=builder /root/ripe-atlas-probe*.deb /
 
 ## the actual image
-FROM debian:12-slim
+FROM debian:12
 LABEL maintainer="dockerhub@public.swineson.me"
 LABEL image="ripe-atlas"
 ARG DEBIAN_FRONTEND=noninteractive
