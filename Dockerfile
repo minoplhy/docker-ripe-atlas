@@ -9,50 +9,31 @@ ARG GIT_URL=https://github.com/RIPE-NCC/ripe-atlas-software-probe.git
 WORKDIR /root
 
 RUN if [ "$BUILDPLATFORM" != "$TARGETPLATFORM" ] ; then \
-		case ${TARGETPLATFORM} in \
-			"linux/arm64")	echo 'export CROSSBUILD_ARCH=arm64 CROSS_COMPILE_TARGET=aarch64-linux-gnu' > env ;; \
-			"linux/arm/v7")	echo 'export CROSSBUILD_ARCH=armhf CROSS_COMPILE_TARGET=arm-linux-gnueabihf' > env ;; \
-			"linux/386")	echo 'export CROSSBUILD_ARCH=i386 CROSS_COMPILE_TARGET=i686-linux-gnu' > env ;; \
-			"linux/amd64")	echo 'export CROSSBUILD_ARCH=amd64 CROSS_COMPILE_TARGET=x86_64-linux-gnu' > env ;; \
-			*) echo "Unsupported platform"; exit 1 ;; \
-		esac \
-		&& . ./env \
-		&& dpkg --add-architecture $CROSSBUILD_ARCH \
-		&& apt-get update -y \
-		&& apt-get install -y libssl-dev:$CROSSBUILD_ARCH crossbuild-essential-$CROSSBUILD_ARCH; \
-	fi \
-	&& apt-get update -y \
-	&& apt-get install -y git tar fakeroot libssl-dev libcap2-bin autoconf automake libtool build-essential
+	apt-get update -y \
+	apt-get install -y git build-essential debhelper libssl-dev autotools-dev psmisc net-tools
 
 RUN git clone --recursive "$GIT_URL"
 
-# Revert to 5080, 5090 needs further testing
 WORKDIR /root/ripe-atlas-software-probe
-RUN git checkout 67b0736887d33d1c42557e7c7694cbd4e5d8e6ee .
-RUN git submodule update
+# version 5100
+RUN git checkout 5100
+RUN dpkg-buildpackage -b -us -uc
 WORKDIR /root
 
-RUN if [ "$BUILDPLATFORM" != "$TARGETPLATFORM" ] ; then \
-		. ./env \
-		&& export CROSS_COMPILE="$CROSS_COMPILE_TARGET-" \
-		&& sed -i 's/.\/configure/.\/configure --host='$CROSS_COMPILE_TARGET'/g' ./ripe-atlas-software-probe/build-config/debian/bin/make-deb \
-		&& sed -i 's/ARCH=$(get_arch)/ARCH='$CROSSBUILD_ARCH'/g' ./ripe-atlas-software-probe/build-config/debian/bin/make-deb; \
-	fi \
-	&& ./ripe-atlas-software-probe/build-config/debian/bin/make-deb
 
 ## artifacts
 FROM scratch AS artifacts
 LABEL image="ripe-atlas-artifacts"
 
-COPY --from=builder /root/atlasswprobe-*.deb /
+COPY --from=builder /root/ripe-atlas-probe*.deb /
 
 ## the actual image
-FROM debian:11-slim
+FROM debian:12-slim
 LABEL maintainer="dockerhub@public.swineson.me"
 LABEL image="ripe-atlas"
 ARG DEBIAN_FRONTEND=noninteractive
 
-COPY --from=builder /root/atlasswprobe-*.deb /tmp
+COPY --from=builder /root/ripe-atlas-probe*.deb /tmp
 
 ARG ATLAS_UID=101
 ARG ATLAS_GID=999
@@ -62,10 +43,10 @@ RUN ln -s /bin/true /bin/systemctl \
 	&& usermod -aG atlas atlas \
 	&& apt-get update -y \
 	&& apt-get install -y libcap2-bin iproute2 openssh-client procps net-tools tini \
-	&& dpkg -i /tmp/atlasswprobe-*.deb \
+	&& dpkg -i /tmp/ripe-atlas-probe*.deb \
 	&& apt-get install -fy \
 	&& rm -rf /var/lib/apt/lists/* \
-	&& rm -f /tmp/atlasswprobe-*.deb \
+	&& rm -f /tmp/ripe-atlas-probe*.deb \
 	&& ln -s /usr/local/atlas/bin/ATLAS /usr/local/bin/atlas
 
 COPY entrypoint.sh /usr/local/bin
