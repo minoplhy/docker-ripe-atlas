@@ -10,7 +10,7 @@ WORKDIR /root
 
 RUN if [ "$BUILDPLATFORM" != "$TARGETPLATFORM" ] ; then \
 		apt-get update -y \
-		apt-get install -y git build-essential debhelper libssl-dev autotools-dev psmisc net-tools
+		apt-get install -y git build-essential debhelper libssl-dev autotools-dev psmisc net-tools \
 	fi
 
 RUN git clone --recursive "$GIT_URL"
