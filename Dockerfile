@@ -13,7 +13,9 @@ RUN git clone --recursive "$GIT_URL"
 WORKDIR /root/ripe-atlas-software-probe
 # version 5100
 RUN git checkout 5100
-RUN dpkg-buildpackage -b -us -uc
+RUN autoreconf -iv
+RUN ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --libdir=/usr/lib64 --runstatedir=/run --with-user=ripe-atlas --with-group=ripe-atlas --with-measurement-user=ripe-atlas-measurement --disable-systemd --enable-chown --enable-setcap-install
+RUN make
 WORKDIR /root
 
 
@@ -21,7 +23,7 @@ WORKDIR /root
 FROM scratch AS artifacts
 LABEL image="ripe-atlas-artifacts"
 
-COPY --from=builder /root/ripe-atlas-probe*.deb /
+COPY --from=builder /root/ripe-atlas-software-probe /
 
 ## the actual image
 FROM debian:12
@@ -29,21 +31,22 @@ LABEL maintainer="dockerhub@public.swineson.me"
 LABEL image="ripe-atlas"
 ARG DEBIAN_FRONTEND=noninteractive
 
-COPY --from=builder /root/ripe-atlas-probe*.deb /tmp
+COPY --from=builder /root/ripe-atlas-software-probe /tmp
 
 ARG ATLAS_UID=101
+ARG ATLAS_MEAS_UID=102
 ARG ATLAS_GID=999
 RUN ln -s /bin/true /bin/systemctl \
-	&& adduser --system --uid $ATLAS_UID atlas \
-	&& groupadd --force --system --gid $ATLAS_GID atlas \
-	&& usermod -aG atlas atlas \
+	&& adduser --system --uid $ATLAS_UID ripe-atlas \
+	&& adduser --system --uid $ATLAS_MEAS_UID ripe-atlas-measurement \
+	&& groupadd --force --system --gid $ATLAS_GID ripe-atlas \
 	&& apt-get update -y \
-	&& apt-get install -y libcap2-bin iproute2 openssh-client procps net-tools tini \
-	&& dpkg -i /tmp/ripe-atlas-probe*.deb \
-	&& apt-get install -fy \
-	&& rm -rf /var/lib/apt/lists/* \
-	&& rm -f /tmp/ripe-atlas-probe*.deb \
-	&& ln -s /usr/local/atlas/bin/ATLAS /usr/local/bin/atlas
+	&& apt-get install -y libcap2-bin iproute2 openssh-client procps net-tools tini debhelper libssl-dev autotools-dev psmisc opensysusers
+
+WORKDIR /tmp/ripe-atlas-software-probe
+RUN make install
+
+# Inprogress
 
 COPY entrypoint.sh /usr/local/bin
 RUN chmod +x /usr/local/bin/* \
