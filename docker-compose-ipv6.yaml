@@ -1,0 +1,35 @@
+services:
+  ripe-atlas:
+    image: ghcr.io/minoplhy/docker-ripe-atlas:latest
+    restart: always
+    environment:
+      RXTXRPT: "yes"
+    volumes:
+      - "./etc:/etc/ripe-atlas"
+      - "./run:/run/ripe-atlas/status"
+      - ./spool:/var/spool/ripe-atlas
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETUID
+      - SETGID
+      - DAC_OVERRIDE
+      - NET_RAW
+    networks:
+      - atlas-network
+    mem_limit: "64000000000"
+    mem_reservation: 64m
+    labels:
+      - "traefik.enable=false"
+      - "com.centurylinklabs.watchtower.enable=true"
+    logging:
+      driver: json-file
+      options:
+         max-size: 10m
+    # network_mode: "host" # if possible, avoid double NAT
+    # security_opt:
+    #   - seccomp:unconfined
+networks:
+  atlas-network:
+    enable_ipv6: true

@@ -7,10 +7,7 @@ if ! sleep 0 >/dev/null 2>&1; then
 fi
 
 export ATLAS_UID="${ATLAS_UID:-101}"
-export ATLAS_GID="${ATLAS_GID:-999}"
-
-usermod -u $ATLAS_UID ripe-atlas
-groupmod -g $ATLAS_GID ripe-atlas
+export ATLAS_GID="${ATLAS_GID:-656}"
 
 # create essential files and fix permission
 mkdir -p /var/spool/ripe-atlas
@@ -27,4 +24,4 @@ chown -R ripe-atlas:ripe-atlas /etc/ripe-atlas || true
 # (init) set atlas mode to prod
 echo "prod" > /etc/ripe-atlas/mode || true
 
-exec setpriv --reuid=$ATLAS_UID --regid=$ATLAS_GID --init-groups "$@"
+exec setpriv --reuid $ATLAS_UID --regid $ATLAS_GID --init-groups "$@"
