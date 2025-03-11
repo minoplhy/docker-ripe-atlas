@@ -24,4 +24,7 @@ chown -R ripe-atlas:ripe-atlas /etc/ripe-atlas || true
 #mkdir -p /var/atlas-probe/state
 #chown -R ripe-atlas:ripe-atlas /var/atlas-probe/state || true
 
+# (init) set atlas mode to prod
+echo "prod" > /etc/ripe-atlas/mode || true
+
 exec setpriv --reuid=$ATLAS_UID --regid=$ATLAS_GID --init-groups "$@"
