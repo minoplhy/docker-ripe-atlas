@@ -52,7 +52,7 @@ RUN chmod +x /usr/local/bin/* \
 	&& chown -R ripe-atlas:ripe-atlas /opt/ripe-atlas \
 	&& chmod 777 /opt/ripe-atlas
 
-WORKDIR /var/atlas-probe
+WORKDIR /
 VOLUME [ "/etc/ripe-atlas", "/run/ripe-atlas/status", "/var/spool/ripe-atlas" ]
 
 ENTRYPOINT [ "tini", "--", "entrypoint.sh" ]

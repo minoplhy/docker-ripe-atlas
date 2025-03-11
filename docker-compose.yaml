@@ -1,12 +1,13 @@
 services:
   ripe-atlas:
-    image: jamesits/ripe-atlas:latest
+    image: ghcr.io/minoplhy/docker-ripe-atlas:latest
     restart: always
     environment:
       RXTXRPT: "yes"
     volumes:
-      - "/var/atlas-probe/etc:/var/atlas-probe/etc"
-      - "/var/atlas-probe/status:/var/atlas-probe/status"
+      - "./etc:/etc/ripe-atlas"
+      - "./run:/run/ripe-atlas/status"
+      - ./spool:/var/spool/ripe-atlas
     cap_drop:
       - ALL
     cap_add:
