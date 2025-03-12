@@ -1,7 +1,6 @@
 ## builder
 FROM alpine:3.21 as builder
 LABEL image="ripe-atlas-builder"
-ARG DEBIAN_FRONTEND=noninteractive
 ARG GIT_URL=https://github.com/RIPE-NCC/ripe-atlas-software-probe.git
 
 COPY alpinelinux-fix-sys-reboot.patch /tmp/alpinelinux-fix-sys-reboot.patch
@@ -32,7 +31,7 @@ COPY --from=builder /tmp/ripe-atlas-software-probe /
 
 ## the actual image
 FROM alpine:3.21
-LABEL maintainer="dockerhub@public.swineson.me"
+LABEL maintainer="c@3qx.nl"
 LABEL image="ripe-atlas"
 
 COPY --from=builder /tmp/ripe-atlas-software-probe /tmp/ripe-atlas-software-probe
