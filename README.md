@@ -85,7 +85,7 @@ At the time of writing, `docker` package on Alpine Linux has problem connecting 
 
 1. `ip6tables -t nat -A POSTROUTING -s <Docker IPv6 subnet>/64 -o <Internet Interface> -j MASQUERADE`
 2. if you're using AWALL add following in `private/`:
-	```
+	```json
 	"snat": [ 
 		{ "src": ["<Docker IPv6 subnet>/64"], "out": "<Internet Interface>", "family" : "inet6" }
 	],
