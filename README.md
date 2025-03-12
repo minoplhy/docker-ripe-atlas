@@ -79,6 +79,18 @@ Note that building this container image requires [BuildKit](https://docs.docker.
 
 If you are on older versions: Docker does not enable IPv6 by default. If you want IPv6 support, some level of setup and a basic understanding of IPv6 is required. Swarm mode & some Kubernetes implementation supports IPv6 too with extra configuration.
 
+### IPv6 on Alpine Linux host
+
+At the time of writing, `docker` package on Alpine Linux has problem connecting to outside of container on IPv6, this is caused by somehow docker package Alpine Linux doesn't set NAT routing on ip6tables, this could be fixed by
+
+1. `ip6tables -t nat -A POSTROUTING -s <Docker IPv6 subnet>/64 -o <Internet Interface> -j MASQUERADE`
+2. if you're using AWALL add following in `private/`:
+	```
+	"snat": [ 
+		{ "src": ["<Docker IPv6 subnet>/64"], "out": "<Internet Interface>", "family" : "inet6" }
+	],
+	```
+
 #### Using native address assignment
 
 If you happened to have a block of static IPv6 addresses routed to your host, you can directly assign one of the addresses to the container. Edit `/etc/docker/daemon.json` and add native IPv6 address blocks, then restart the Docker daemon. An example:

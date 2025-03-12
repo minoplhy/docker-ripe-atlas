@@ -16,6 +16,9 @@ mkdir -p /var/spool/ripe-atlas/data
 chown -R ripe-atlas:ripe-atlas /var/spool/ripe-atlas/data || true
 mkdir -p /run/ripe-atlas/status
 chown -R ripe-atlas:ripe-atlas /run/ripe-atlas/status || true
+mkdir -p /run/ripe-atlas/pids
+chown -R ripe-atlas:ripe-atlas /run/ripe-atlas/pids || true
+touch  /run/ripe-atlas/pids/perd-7.pid.vol
 mkdir -p /etc/ripe-atlas
 chown -R ripe-atlas:ripe-atlas /etc/ripe-atlas || true
 #mkdir -p /var/atlas-probe/state
