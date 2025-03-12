@@ -52,7 +52,7 @@ RUN make install
 COPY entrypoint.sh /usr/local/bin
 RUN chmod +x /usr/local/bin/* \
 	&& rm -rf /tmp/ripe-atlas-software-probe \
-	&& apk del autoconf automake psmisc alpine-sdk libtool linux-headers
+	&& apk del autoconf automake
 
 WORKDIR /
 VOLUME [ "/etc/ripe-atlas", "/run/ripe-atlas/status", "/var/spool/ripe-atlas" ]
