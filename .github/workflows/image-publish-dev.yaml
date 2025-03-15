@@ -45,7 +45,6 @@ jobs:
         with:
           context: .
           push: true
-          platforms: linux/amd64,linux/arm64
           labels: ${{ steps.meta.outputs.labels }}
           tags: |
             ghcr.io/minoplhy/docker-ripe-atlas:dev
