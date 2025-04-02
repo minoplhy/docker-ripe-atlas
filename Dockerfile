@@ -13,11 +13,8 @@ RUN apk update && \
 RUN git clone --recursive "$GIT_URL" /tmp/ripe-atlas-software-probe
 
 WORKDIR /tmp/ripe-atlas-software-probe
-# version 5100
-RUN git checkout 5100
-
-# APPLY Alpine Linux specific patch
-RUN git apply /tmp/alpinelinux-fix-sys-reboot.patch
+# version 5110
+RUN git checkout 5110
 
 RUN autoreconf -iv
 RUN ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --libdir=/usr/lib64 --runstatedir=/run --with-user=ripe-atlas --with-group=ripe-atlas --with-measurement-user=ripe-atlas --disable-systemd --enable-chown --enable-setcap-install
