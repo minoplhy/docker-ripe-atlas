@@ -3,8 +3,6 @@ FROM alpine:3.21 as builder
 LABEL image="ripe-atlas-builder"
 ARG GIT_URL=https://github.com/RIPE-NCC/ripe-atlas-software-probe.git
 
-COPY alpinelinux-fix-sys-reboot.patch /tmp/alpinelinux-fix-sys-reboot.patch
-
 WORKDIR /
 
 RUN apk update && \
